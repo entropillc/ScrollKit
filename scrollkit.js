@@ -30,6 +30,16 @@
   }
 })();
 
+var SKScrollEventType = {
+  ScrollStart: 'SKScrollStart',
+  ScrollEnd: 'SKScrollEnd'
+};
+
+var SKScrollBarType = {
+  Horizontal: 0,
+  Vertical: 1
+};
+
 var SKScrollView = function(element) {
   var kBounceTransitionDuration = 0.35;
   var kAccelerationTimeout = 250;
@@ -42,12 +52,13 @@ var SKScrollView = function(element) {
   var kScrollBarHideTimeout = 100;
   
   var _isDragging = false;
+  var _isDecelerating = false;
+  var _isScrolling = false;
   var _startAccelerateX = 0;
   var _startAccelerateY = 0;
   var _lastMouseX = -1;
   var _lastMouseY = -1;
   var _lastTimeStamp = Date.now();
-  var _isDecelerating = false;
   var _decelerationAnimationInterval = null;
   
   var $window = $(window['addEventListener'] ? window : document.body);
@@ -84,8 +95,10 @@ var SKScrollView = function(element) {
       if (Math.abs(velocityX) <= kMinimumVelocity &&
           Math.abs(velocityY) <= kMinimumVelocity) {
         _isDecelerating = false;
+        _isScrolling = false;
         horizontalScrollBar.hide();
         verticalScrollBar.hide();
+        $element.trigger(SKScrollEventType.ScrollEnd);
         return;
       }
       
@@ -110,14 +123,24 @@ var SKScrollView = function(element) {
       _decelerationAnimationInterval = window.requestAnimationFrame(stepAnimation);
       lastFrameTime = Date.now();
     } else {
+      _isScrolling = false;
       horizontalScrollBar.hide();
       verticalScrollBar.hide();
+      $element.trigger(SKScrollEventType.ScrollEnd);
     }
   };
   
   var stopDeceleration = function() {
     _isDecelerating = false;
     window.cancelAnimationFrame(_decelerationAnimationInterval);
+  };
+  
+  var bounceTransitionEndHandler = function(evt) {
+    $element.unbind(evt);
+    _isScrolling = false;
+    horizontalScrollBar.hide();
+    verticalScrollBar.hide();
+    $element.trigger(SKScrollEventType.ScrollEnd);
   };
   
   $element.bind('mousedown touchstart', function(evt) {
@@ -160,8 +183,8 @@ var SKScrollView = function(element) {
     var x = self.x + deltaX;
     var y = self.y + deltaY;
     
-    x -= ((x < minimumX) ? (deltaX) : (x > 0) ? deltaX : 0) / 2;
-    y -= ((y < minimumY) ? (deltaY) : (y > 0) ? deltaY : 0) / 2;
+    x -= ((x < minimumX) ? deltaX : (x > 0) ? deltaX : 0) / 2;
+    y -= ((y < minimumY) ? deltaY : (y > 0) ? deltaY : 0) / 2;
     
     self.x = !self.canScrollHorizontal() ? 0 : x;
     self.y = !self.canScrollVertical() ? 0 : y;
@@ -176,12 +199,12 @@ var SKScrollView = function(element) {
       _lastTimeStamp = evt.timeStamp;
     }
     
-    if (self.canScrollHorizontal()) {
-      horizontalScrollBar.update();
-    }
+    if (self.canScrollHorizontal()) horizontalScrollBar.update();
+    if (self.canScrollVertical()) verticalScrollBar.update();
     
-    if (self.canScrollVertical()) {
-      verticalScrollBar.update();
+    if (!_isScrolling) {
+      _isScrolling = true;
+      $element.trigger(SKScrollEventType.ScrollStart);
     }
     
     _lastMouseX = mouseX;
@@ -199,11 +222,10 @@ var SKScrollView = function(element) {
     var y = Math.min(Math.max(minimumY, self.y), 0);
     
     var bounce = function() {
+      $element.bind('webkitTransitionEnd transitionend MSTransitionEnd oTransitionEnd transitionEnd', bounceTransitionEndHandler);
       content.translate(x, y, kBounceTransitionDuration);
       self.x = _startAccelerateX = !self.canScrollHorizontal() ? 0 : x;
       self.y = _startAccelerateX = !self.canScrollVertical() ? 0 : y;
-      horizontalScrollBar.hide();
-      verticalScrollBar.hide();
     };
     
     if (accelerationTime < kAccelerationTimeout) {
@@ -215,8 +237,10 @@ var SKScrollView = function(element) {
     } else if (x !== self.x || y !== self.y) {
       bounce();
     } else {
+      _isScrolling = false;
       horizontalScrollBar.hide();
       verticalScrollBar.hide();
+      $element.trigger(SKScrollEventType.ScrollEnd);
     }
     
     _isDragging = false;
@@ -286,11 +310,6 @@ SKScrollContent.prototype = {
     if (scrollView.canScrollHorizontal()) scrollView.horizontalScrollBar.update();
     if (scrollView.canScrollVertical()) scrollView.verticalScrollBar.update();
   }
-};
-
-var SKScrollBarType = {
-  Horizontal: 0,
-  Vertical: 1
 };
 
 var SKScrollBar = function(scrollView, type) {
@@ -408,9 +427,5 @@ SKScrollBar.prototype = {
 };
 
 $(function() {
-  var scrollViews = $('.sk-scroll-view');
-  
-  scrollViews.each(function(index, element) {
-    new SKScrollView(element);
-  });
+  $('.sk-scroll-view').each(function(index, element) { new SKScrollView(element); });
 });
