@@ -8,12 +8,6 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
-  -webkit-transform-style: preserve-3d;
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
-  -o-transform: translate(0, 0);
-  transform: translate(0, 0);
 }
 
 .sk-scroll-content {
@@ -29,7 +23,6 @@
   -webkit-box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
   -moz-box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
   box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
-  -webkit-transform-style: preserve-3d;
   -webkit-transition-duration: 0s;
   -moz-transition-duration: 0s;
   -ms-transition-duration: 0s;
