@@ -95,10 +95,7 @@ var SKScrollView = function(element) {
       if (Math.abs(velocityX) <= kMinimumVelocity &&
           Math.abs(velocityY) <= kMinimumVelocity) {
         _isDecelerating = false;
-        _isScrolling = false;
-        horizontalScrollBar.hide();
-        verticalScrollBar.hide();
-        $element.trigger(SKScrollEventType.ScrollEnd);
+        scrollEnd();
         return;
       }
       
@@ -123,10 +120,7 @@ var SKScrollView = function(element) {
       _decelerationAnimationInterval = window.requestAnimationFrame(stepAnimation);
       lastFrameTime = Date.now();
     } else {
-      _isScrolling = false;
-      horizontalScrollBar.hide();
-      verticalScrollBar.hide();
-      $element.trigger(SKScrollEventType.ScrollEnd);
+      scrollEnd();
     }
   };
   
@@ -135,12 +129,31 @@ var SKScrollView = function(element) {
     window.cancelAnimationFrame(_decelerationAnimationInterval);
   };
   
-  var bounceTransitionEndHandler = function(evt) {
-    $element.unbind(evt);
+  var scrollStart = function() {
+    _isScrolling = true;
+    $element.trigger(SKScrollEventType.ScrollStart);
+  };
+  
+  var scrollEnd = function() {
     _isScrolling = false;
+    
     horizontalScrollBar.hide();
     verticalScrollBar.hide();
+    
+    var x = Math.round(self.x);
+    var y = Math.round(self.y);
+    
+    self.x = x;
+    self.y = y;
+    
+    content.translate(x, y);
+    
     $element.trigger(SKScrollEventType.ScrollEnd);
+  };
+  
+  var bounceTransitionEndHandler = function(evt) {
+    $element.unbind(evt);
+    scrollEnd();
   };
   
   $element.bind('mousedown touchstart', function(evt) {
@@ -201,11 +214,7 @@ var SKScrollView = function(element) {
     
     if (self.canScrollHorizontal()) horizontalScrollBar.update();
     if (self.canScrollVertical()) verticalScrollBar.update();
-    
-    if (!_isScrolling) {
-      _isScrolling = true;
-      $element.trigger(SKScrollEventType.ScrollStart);
-    }
+    if (!_isScrolling) scrollStart();
     
     _lastMouseX = mouseX;
     _lastMouseY = mouseY;
@@ -237,10 +246,7 @@ var SKScrollView = function(element) {
     } else if (x !== self.x || y !== self.y) {
       bounce();
     } else {
-      _isScrolling = false;
-      horizontalScrollBar.hide();
-      verticalScrollBar.hide();
-      $element.trigger(SKScrollEventType.ScrollEnd);
+      scrollEnd();
     }
     
     _isDragging = false;
