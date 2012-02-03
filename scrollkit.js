@@ -130,23 +130,25 @@ var SKScrollView = function(element) {
   };
   
   var scrollStart = function() {
+    if (_isScrolling) return;
+    
     _isScrolling = true;
+    
+    if (self.canScrollHorizontal()) horizontalScrollBar.show();
+    if (self.canScrollVertical()) verticalScrollBar.show();
+    
     $element.trigger(SKScrollEventType.ScrollStart);
   };
   
   var scrollEnd = function() {
+    if (!_isScrolling) return;
+    
     _isScrolling = false;
     
-    horizontalScrollBar.hide();
-    verticalScrollBar.hide();
+    content.translate(self.x = Math.round(self.x), self.y = Math.round(self.y));
     
-    var x = Math.round(self.x);
-    var y = Math.round(self.y);
-    
-    self.x = x;
-    self.y = y;
-    
-    content.translate(x, y);
+    if (self.canScrollHorizontal()) horizontalScrollBar.hide();
+    if (self.canScrollVertical()) verticalScrollBar.hide();
     
     $element.trigger(SKScrollEventType.ScrollEnd);
   };
@@ -159,27 +161,21 @@ var SKScrollView = function(element) {
   $element.bind('mousedown touchstart', function(evt) {
     var scrollViewSize = self.getSize();
     var contentSize = content.getSize();
-    var x = _startAccelerateX = self.x;
-    var y = _startAccelerateY = self.y;
-    var minimumX = self.minimumX = scrollViewSize.width - contentSize.width;
-    var minimumY = self.minimumY = scrollViewSize.height - contentSize.height;
+    
+    self.minimumX = scrollViewSize.width - contentSize.width;
+    self.minimumY = scrollViewSize.height - contentSize.height;
     
     _isDragging = true;
+    _startAccelerateX = self.x;
+    _startAccelerateY = self.y;
     _lastMouseX = (evt.type === 'touchstart') ? evt.originalEvent.touches[0].pageX : evt.pageX;
     _lastMouseY = (evt.type === 'touchstart') ? evt.originalEvent.touches[0].pageY : evt.pageY;
     _lastTimeStamp = evt.timeStamp;
     
     stopDeceleration();
     
-    if (self.canScrollHorizontal()) {
-      horizontalScrollBar.show();
-      horizontalScrollBar.update(true);
-    }
-    
-    if (self.canScrollVertical()) {
-      verticalScrollBar.show();
-      verticalScrollBar.update(true);
-    }
+    if (self.canScrollHorizontal()) horizontalScrollBar.update(true);
+    if (self.canScrollVertical()) verticalScrollBar.update(true);
     
     evt.preventDefault();
   });
@@ -191,24 +187,21 @@ var SKScrollView = function(element) {
     var mouseY = (evt.type === 'touchmove') ? evt.originalEvent.touches[0].pageY : evt.pageY;
     var deltaX = mouseX - _lastMouseX;
     var deltaY = mouseY - _lastMouseY;
-    var minimumX = self.minimumX;
-    var minimumY = self.minimumY;
     var x = self.x + deltaX;
     var y = self.y + deltaY;
     
-    x -= ((x < minimumX) ? deltaX : (x > 0) ? deltaX : 0) / 2;
-    y -= ((y < minimumY) ? deltaY : (y > 0) ? deltaY : 0) / 2;
+    x -= ((x < self.minimumX) ? deltaX : (x > 0) ? deltaX : 0) / 2;
+    y -= ((y < self.minimumY) ? deltaY : (y > 0) ? deltaY : 0) / 2;
+    x = self.x = !self.canScrollHorizontal() ? 0 : x;
+    y = self.y = !self.canScrollVertical() ? 0 : y;
     
-    self.x = !self.canScrollHorizontal() ? 0 : x;
-    self.y = !self.canScrollVertical() ? 0 : y;
-    
-    content.translate(self.x, self.y);
+    content.translate(x, y);
     
     var accelerationTime = evt.timeStamp - _lastTimeStamp;
     
     if (accelerationTime > kAccelerationTimeout) {
-      _startAccelerateX = self.x;
-      _startAccelerateY = self.y;
+      _startAccelerateX = x;
+      _startAccelerateY = y;
       _lastTimeStamp = evt.timeStamp;
     }
     
@@ -225,16 +218,18 @@ var SKScrollView = function(element) {
     
     var timeStamp = evt.timeStamp;
     var accelerationTime = timeStamp - _lastTimeStamp;
-    var minimumX = self.minimumX;
-    var minimumY = self.minimumY;
-    var x = Math.min(Math.max(minimumX, self.x), 0);
-    var y = Math.min(Math.max(minimumY, self.y), 0);
+    var x = Math.min(Math.max(self.minimumX, self.x), 0);
+    var y = Math.min(Math.max(self.minimumY, self.y), 0);
     
     var bounce = function() {
       $element.bind('webkitTransitionEnd transitionend MSTransitionEnd oTransitionEnd transitionEnd', bounceTransitionEndHandler);
       content.translate(x, y, kBounceTransitionDuration);
+      
+      if (self.canScrollHorizontal()) horizontalScrollBar.hide();
+      if (self.canScrollVertical()) verticalScrollBar.hide();
+      
       self.x = _startAccelerateX = !self.canScrollHorizontal() ? 0 : x;
-      self.y = _startAccelerateX = !self.canScrollVertical() ? 0 : y;
+      self.y = _startAccelerateY = !self.canScrollVertical() ? 0 : y;
     };
     
     if (accelerationTime < kAccelerationTimeout) {
@@ -328,10 +323,10 @@ var SKScrollBar = function(scrollView, type) {
   scrollView.$element.append($element);
   
   if (this.type === SKScrollBarType.Horizontal) {
-    this.width = parseInt($element.css('height'), 10);
+    this.thickness = parseInt($element.css('height'), 10);
     $element.css({ 'bottom': '0', 'left': '0' });
   } else {
-    this.width = parseInt($element.css('width'), 10);
+    this.thickness = parseInt($element.css('width'), 10);
     $element.css({ 'top': '0', 'right': '0' });
   }
 };
@@ -345,7 +340,7 @@ SKScrollBar.prototype = {
   scrollView: null,
   type: SKScrollBarType.Horizontal,
   minimumSize: 34,
-  width: 5,
+  thickness: 5,
   setSize: function(value) {
     this._size = value;
     this.$element.css((this.type === SKScrollBarType.Horizontal) ? 'width' : 'height', value + 'px');
@@ -353,7 +348,7 @@ SKScrollBar.prototype = {
   update: function(recalculateSize) {
     var scrollView = this.scrollView;
     var minimumSize = this.minimumSize;
-    var width = this.width;
+    var thickness = this.thickness;
     var type = this.type;
     var content = scrollView.content;
     var scrollViewSize, contentSize
@@ -371,7 +366,7 @@ SKScrollBar.prototype = {
     var margin, size, scrollPosition, minimumPosition, position, translate3d, translate;
     
     if (type === SKScrollBarType.Horizontal) {
-      margin = (canScrollVertical ? width * 2 : width) + 1;
+      margin = (canScrollVertical ? thickness * 2 : thickness) + 1;
       scrollPosition = scrollView.x;
       size = (!recalculateSize && minimumPosition < scrollPosition && scrollPosition < 0) ?
         this._size : Math.max(minimumSize, Math.round(
@@ -382,17 +377,17 @@ SKScrollBar.prototype = {
       position = (scrollPosition / minimumPosition) * (scrollViewSize.width - margin - size);
       
       if (scrollPosition > 0) {
-        size = Math.round(Math.max(size - scrollPosition, width));
+        size = Math.round(Math.max(size - scrollPosition, thickness));
         position = 1;
       } else if (scrollPosition < minimumPosition) {
-        size = Math.round(Math.max(size - minimumPosition + scrollPosition, width));
+        size = Math.round(Math.max(size - minimumPosition + scrollPosition, thickness));
         position = scrollViewSize.width - size - margin;
       }
       
       translate3d = 'translate3d(' + position + 'px, 0, 0)';
       translate = 'translate(' + position + 'px, 0)';
     } else {
-      margin = (canScrollHorizontal ? width * 2 : width) + 1;
+      margin = (canScrollHorizontal ? thickness * 2 : thickness) + 1;
       scrollPosition = scrollView.y;
       size = (!recalculateSize && minimumPosition < scrollPosition && scrollPosition < 0) ?
         this._size : Math.max(minimumSize, Math.round(
@@ -403,10 +398,10 @@ SKScrollBar.prototype = {
       position = (scrollPosition / minimumPosition) * (scrollViewSize.height - margin - size);
       
       if (scrollPosition > 0) {
-        size = Math.round(Math.max(size - scrollPosition, width));
+        size = Math.round(Math.max(size - scrollPosition, thickness));
         position = 1;
       } else if (scrollPosition < minimumPosition) {
-        size = Math.round(Math.max(size - minimumPosition + scrollPosition, width));
+        size = Math.round(Math.max(size - minimumPosition + scrollPosition, thickness));
         position = scrollViewSize.height - size - margin;
       }
       

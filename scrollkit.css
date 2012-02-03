@@ -37,7 +37,7 @@
 
 .sk-scroll-bar {
   background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: absolute;
   width: 5px;
   height: 5px;
