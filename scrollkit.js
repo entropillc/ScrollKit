@@ -176,8 +176,6 @@ var SKScrollView = function(element) {
     
     if (self.canScrollHorizontal()) horizontalScrollBar.update(true);
     if (self.canScrollVertical()) verticalScrollBar.update(true);
-    
-    evt.preventDefault();
   });
   
   $window.bind('mousemove touchmove', function(evt) {
@@ -211,6 +209,8 @@ var SKScrollView = function(element) {
     
     _lastMouseX = mouseX;
     _lastMouseY = mouseY;
+    
+    evt.preventDefault();
   });
   
   $window.bind('mouseup touchend', function(evt) {
@@ -248,6 +248,8 @@ var SKScrollView = function(element) {
     _lastMouseX = -1;
     _lastMouseY = -1;
     _lastTimeStamp = timeStamp;
+    
+    evt.preventDefault();
   });
   
   $element.data('scrollView', this);
