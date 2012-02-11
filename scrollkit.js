@@ -176,6 +176,8 @@ var SKScrollView = function(element) {
     
     if (self.canScrollHorizontal()) horizontalScrollBar.update(true);
     if (self.canScrollVertical()) verticalScrollBar.update(true);
+    
+    if (evt.type === 'mousedown') evt.preventDefault();
   });
   
   $window.bind('mousemove touchmove', function(evt) {
