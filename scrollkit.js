@@ -66,10 +66,36 @@ var SKScrollView = function(element) {
   var $element = this.$element = $(element);
   element = this.element = $(element).get(0);
   
+  var self = this;
   var content = this.content = new SKScrollContent(this);
+  
+  // Detect and support native touch scrolling (iOS 5).
+  var isNativeTouchScrollingSupported = ($element.css('-webkit-overflow-scrolling') === 'touch');
+  
+  if (isNativeTouchScrollingSupported) {
+    $element.css('overflow', 'scroll');
+    
+    $element.bind('touchstart', function(evt) {
+      var scrollViewSize = self.getSize();
+      var contentSize = content.getSize();
+      var maximumX = contentSize.width - scrollViewSize.width;
+      var maximumY = contentSize.height - scrollViewSize.height;
+      var scrollLeft = $element.scrollLeft();
+      var scrollTop = $element.scrollTop();
+      
+      scrollLeft = (scrollLeft === 0) ? 1 : (scrollLeft === maximumX) ? maximumX - 1 : scrollLeft;
+      scrollTop = (scrollTop === 0) ? 1 : (scrollTop === maximumY) ? maximumY - 1 : scrollTop;
+      
+      $element.scrollLeft(scrollLeft);
+      $element.scrollTop(scrollTop);
+    });
+    
+    // Stop further initialization and use native touch scrolling.
+    return;
+  }
+  
   var horizontalScrollBar = this.horizontalScrollBar = new SKScrollBar(this, SKScrollBarType.Horizontal);
   var verticalScrollBar = this.verticalScrollBar = new SKScrollBar(this, SKScrollBarType.Vertical);
-  var self = this;
   
   var startDeceleration = function(startTime) {
     var acceleration = (startTime - _lastTimeStamp) / kAcceleration;
@@ -370,9 +396,10 @@ SKScrollBar.prototype = {
   scrollView: null,
   type: SKScrollBarType.Horizontal,
   minimumSize: 34,
-  thickness: 5,
+  thickness: 0,
   setSize: function(value) {
     this._size = value;
+    this.$element.css((this.type === SKScrollBarType.Horizontal) ? 'height' : 'width', this.thickness + 'px');
     this.$element.css((this.type === SKScrollBarType.Horizontal) ? 'width' : 'height', value + 'px');
   },
   update: function(recalculateSize) {
