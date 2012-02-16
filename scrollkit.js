@@ -64,6 +64,12 @@ var SKScrollView = function(element) {
   
   var $window = $(window['addEventListener'] ? window : document.body);
   var $element = this.$element = $(element);
+  
+  var scrollView = $element.data('scrollView');
+  if (scrollView) return scrollView;
+  
+  $element.data('scrollView', this);
+  
   element = this.element = $(element).get(0);
   
   var self = this;
@@ -305,8 +311,6 @@ var SKScrollView = function(element) {
     
     evt.preventDefault();
   });
-  
-  $element.data('scrollView', this);
 };
 
 SKScrollView.prototype = {
