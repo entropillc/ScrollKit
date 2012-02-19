@@ -171,6 +171,7 @@ var SKScrollView = function(element) {
     if (self.canScrollVertical()) verticalScrollBar.show();
     
     $element.trigger(SKScrollEventType.ScrollStart);
+    $('input:focus').blur();
   };
   
   var scrollEnd = function() {
@@ -263,9 +264,10 @@ var SKScrollView = function(element) {
       _lastTimeStamp = evt.timeStamp;
     }
     
-    if (self.canScrollHorizontal()) horizontalScrollBar.update();
-    if (self.canScrollVertical()) verticalScrollBar.update();
-    if (!_isScrolling) scrollStart();
+    if (self.canScrollHorizontal() && deltaX !== 0) horizontalScrollBar.update();
+    if (self.canScrollVertical() && deltaY !== 0) verticalScrollBar.update();
+    if (!_isScrolling && ((self.canScrollHorizontal() && deltaX !== 0) ||
+        (self.canScrollVertical() && deltaY !== 0))) scrollStart();
     
     _lastMouseX = mouseX;
     _lastMouseY = mouseY;
