@@ -272,7 +272,7 @@ var SKScrollView = function(element) {
     _lastMouseX = mouseX;
     _lastMouseY = mouseY;
     
-    evt.preventDefault();
+    if (evt.type === 'mousemove') evt.preventDefault();
   });
   
   $window.bind('mouseup touchend', function(evt) {
@@ -311,7 +311,7 @@ var SKScrollView = function(element) {
     _lastMouseY = -1;
     _lastTimeStamp = timeStamp;
     
-    evt.preventDefault();
+    if (evt.type === 'mouseup') evt.preventDefault();
   });
 };
 
