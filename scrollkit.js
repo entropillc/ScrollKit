@@ -218,7 +218,12 @@ var SKScrollView = function(element) {
     if (self.canScrollHorizontal()) horizontalScrollBar.update(true);
     if (self.canScrollVertical()) verticalScrollBar.update(true);
     
-    if (evt.type === 'mousedown') evt.preventDefault();
+    //if (evt.type === 'mousedown') evt.preventDefault();
+  });
+  
+  // TODO: TEMPORARY FIX TO PREVENT NATIVE WINDOW SCROLLING
+  $window.bind('touchmove', function(evt) {
+    evt.preventDefault();
   });
   
   $window.bind('mousemove touchmove', function(evt) {
@@ -272,7 +277,7 @@ var SKScrollView = function(element) {
     _lastMouseX = mouseX;
     _lastMouseY = mouseY;
     
-    if (evt.type === 'mousemove') evt.preventDefault();
+    //if (evt.type === 'mousemove') evt.preventDefault();
   });
   
   $window.bind('mouseup touchend', function(evt) {
@@ -311,7 +316,7 @@ var SKScrollView = function(element) {
     _lastMouseY = -1;
     _lastTimeStamp = timeStamp;
     
-    if (evt.type === 'mouseup') evt.preventDefault();
+    //if (evt.type === 'mouseup') evt.preventDefault();
   });
 };
 
