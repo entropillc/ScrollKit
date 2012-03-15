@@ -63,14 +63,14 @@ var SKScrollView = function(element) {
   var _decelerationAnimationInterval = null;
   
   var $window = $(window['addEventListener'] ? window : document.body);
-  var $element = this.$element = $(element);
   
-  var scrollView = $element.data('scrollView');
+  var $element = this.$element = $(element);
+  element = this.element = $(element).get(0);
+  
+  var scrollView = element.scrollView;
   if (scrollView) return scrollView;
   
-  $element.data('scrollView', this);
-  
-  element = this.element = $(element).get(0);
+  element.scrollView = this;
   
   var self = this;
   var content = this.content = new SKScrollContent(this);
@@ -205,9 +205,10 @@ var SKScrollView = function(element) {
     _lastTimeStamp = evt.timeStamp;
     
     if (evt.type === 'touchstart') {
-      _lastMouseX = evt.originalEvent.targetTouches[0].pageX;
-      _lastMouseY = evt.originalEvent.targetTouches[0].pageY;
-      _lastTouchIdentifier = evt.originalEvent.targetTouches[0].identifier;
+      var targetTouches = evt.targetTouches || evt.originalEvent.targetTouches;
+      _lastMouseX = targetTouches[0].pageX;
+      _lastMouseY = targetTouches[0].pageY;
+      _lastTouchIdentifier = targetTouches[0].identifier;
     } else {
       _lastMouseX = evt.pageX;
       _lastMouseY = evt.pageY;
@@ -225,7 +226,7 @@ var SKScrollView = function(element) {
     var mouseX, mouseY;
     
     if (evt.type === 'touchmove') {
-      var touches = evt.originalEvent.touches;
+      var touches = evt.touches || evt.originalEvent.touches;
       var touch = touches[0];
       
       for (var i = 0, length = touches.length; i < length; i++) {
