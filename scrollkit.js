@@ -331,10 +331,11 @@ SKScrollView.prototype = {
 
 var SKScrollContent = function(scrollView) {
   this.scrollView = scrollView;
-  scrollView.$element.wrapInner('<div class="sk-scroll-content"/>');
   
-  var $element = this.$element = scrollView.$element.children('.sk-scroll-content');
+  var $element = this.$element = $('<div class="sk-scroll-content"/>');
   var element = this.element = $element.get(0);
+  
+  scrollView.$element.append($element.append(scrollView.$element.children()));
 };
 
 SKScrollContent.prototype = {
