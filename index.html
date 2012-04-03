@@ -9,8 +9,11 @@
   <script type="text/javascript" src="scrollkit.js"></script>
   <script type="text/javascript">
     $(function() {
-      var scrollEventTypes = SKScrollEventType.ScrollStart + ' ' + SKScrollEventType.ScrollEnd;
+      var scrollEventTypes = [];
+      for (var eventType in SKScrollEventType) scrollEventTypes.push(SKScrollEventType[eventType]);
+      scrollEventTypes = scrollEventTypes.join(' ');
       $('.sk-scroll-view').bind(scrollEventTypes, function(evt) {
+        if (evt.type !== SKScrollEventType.ScrollChange)
         console.log(evt.type);
       });
     });
