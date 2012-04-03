@@ -32,7 +32,6 @@
 
 var SKScrollEventType = {
   ScrollStart: 'SKScrollStart',
-  ScrollChange: 'SKScrollChange',
   ScrollEnd: 'SKScrollEnd'
 };
 
@@ -54,6 +53,7 @@ var SKScrollView = function(element) {
   
   var _isDragging = false;
   var _isDecelerating = false;
+  var _isScrolling = false;
   var _startAccelerateX = 0;
   var _startAccelerateY = 0;
   var _lastMouseX = -1;
@@ -74,61 +74,6 @@ var SKScrollView = function(element) {
   
   var self = this;
   var content = this.content = new SKScrollContent(this);
-  
-  // Detect and support native touch scrolling (iOS 5).
-  var isNativeTouchScrollingSupported = ($element.css('-webkit-overflow-scrolling') === 'touch');
-  
-  if (isNativeTouchScrollingSupported) {
-    $element.css('overflow', 'scroll');
-    
-    var _isScrolling = false;
-    var _isTouchDown = false;
-    var _scrollEndTimeout;
-    
-    $element.bind('touchstart', function(evt) {
-      var scrollViewSize = self.getSize();
-      var contentSize = content.getSize();
-      var maximumX = contentSize.width - scrollViewSize.width;
-      var maximumY = contentSize.height - scrollViewSize.height;
-      var scrollLeft = $element.scrollLeft();
-      var scrollTop = $element.scrollTop();
-      
-      scrollLeft = (scrollLeft === 0) ? 1 : (scrollLeft === maximumX) ? maximumX - 1 : scrollLeft;
-      scrollTop = (scrollTop === 0) ? 1 : (scrollTop === maximumY) ? maximumY - 1 : scrollTop;
-      
-      $element.scrollLeft(scrollLeft);
-      $element.scrollTop(scrollTop);
-      
-      _isTouchDown = true;
-    });
-    
-    $element.bind('touchend', function(evt) {
-      if (!_isTouchDown) return;
-      
-      window.clearTimeout(_scrollEndTimeout);
-      _scrollEndTimeout = window.setTimeout(function() {
-        _isTouchDown = false;
-        _isScrolling = false;
-        window.clearTimeout(_scrollEndTimeout);
-        $element.trigger(SKScrollEventType.ScrollEnd);
-      }, 1000);
-    });
-    
-    $element.bind('scroll', function(evt) {
-      if (!_isTouchDown) return;
-      
-      if (!_isScrolling) {
-        _isScrolling = true;
-        $element.trigger(SKScrollEventType.ScrollStart);
-      }
-      
-      $element.trigger(SKScrollEventType.ScrollChange);
-    });
-    
-    // Stop further initialization and use native touch scrolling.
-    return;
-  }
-  
   var horizontalScrollBar = this.horizontalScrollBar = new SKScrollBar(this, SKScrollBarType.Horizontal);
   var verticalScrollBar = this.verticalScrollBar = new SKScrollBar(this, SKScrollBarType.Vertical);
   
@@ -192,21 +137,21 @@ var SKScrollView = function(element) {
   };
   
   var scrollStart = function() {
-    if (self.isScrolling) return;
+    if (_isScrolling) return;
     
-    self.isScrolling = true;
+    _isScrolling = true;
     
     if (self.canScrollHorizontal()) horizontalScrollBar.show();
     if (self.canScrollVertical()) verticalScrollBar.show();
     
-    $element.find('input:focus').blur();
     $element.trigger(SKScrollEventType.ScrollStart);
+    $('input:focus').blur();
   };
   
   var scrollEnd = function() {
-    if (!self.isScrolling) return;
+    if (!_isScrolling) return;
     
-    self.isScrolling = false;
+    _isScrolling = false;
     
     content.translate(self.x = Math.round(self.x), self.y = Math.round(self.y));
     
@@ -247,12 +192,9 @@ var SKScrollView = function(element) {
     
     if (self.canScrollHorizontal()) horizontalScrollBar.update(true);
     if (self.canScrollVertical()) verticalScrollBar.update(true);
-    
-    $window.bind('mousemove touchmove', mouseMoveHandler);
-    $window.bind('mouseup touchend', mouseUpHandler);
   });
   
-  var mouseMoveHandler = function(evt) {
+  $window.bind('mousemove touchmove', function(evt) {
     if (!_isDragging) return;
     
     var mouseX, mouseY;
@@ -297,16 +239,16 @@ var SKScrollView = function(element) {
     
     if (self.canScrollHorizontal() && deltaX !== 0) horizontalScrollBar.update();
     if (self.canScrollVertical() && deltaY !== 0) verticalScrollBar.update();
-    if (!self.isScrolling && ((self.canScrollHorizontal() && deltaX !== 0) ||
+    if (!_isScrolling && ((self.canScrollHorizontal() && deltaX !== 0) ||
         (self.canScrollVertical() && deltaY !== 0))) scrollStart();
     
     _lastMouseX = mouseX;
     _lastMouseY = mouseY;
     
     evt.preventDefault();
-  };
+  });
   
-  var mouseUpHandler = function(evt) {
+  $window.bind('mouseup touchend', function(evt) {
     if (!_isDragging) return;
     
     var timeStamp = evt.timeStamp;
@@ -341,10 +283,7 @@ var SKScrollView = function(element) {
     _lastMouseX = -1;
     _lastMouseY = -1;
     _lastTimeStamp = timeStamp;
-    
-    $window.unbind('mousemove touchmove', mouseMoveHandler);
-    $window.unbind('mouseup touchend', mouseUpHandler);
-  };
+  });
 };
 
 SKScrollView.prototype = {
@@ -357,9 +296,6 @@ SKScrollView.prototype = {
   verticalScrollBar: null,
   x: 0,
   y: 0,
-  width: 0,
-  height: 0,
-  isScrolling: false,
   canScrollHorizontal: function() { return (this.minimumX < 0); },
   canScrollVertical: function() { return (this.minimumY < 0); },
   getSize: function() {
@@ -408,8 +344,6 @@ SKScrollContent.prototype = {
     
     if (scrollView.canScrollHorizontal()) scrollView.horizontalScrollBar.update();
     if (scrollView.canScrollVertical()) scrollView.verticalScrollBar.update();
-    
-    if (scrollView.isScrolling) scrollView.$element.trigger(SKScrollEventType.ScrollChange);
   }
 };
 
@@ -528,7 +462,6 @@ SKScrollBar.prototype = {
   }
 };
 
-// Initialize all scroll views.
 $(function() {
   $('.sk-scroll-view').each(function(index, element) { new SKScrollView(element); });
 });
