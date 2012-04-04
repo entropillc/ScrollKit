@@ -77,6 +77,12 @@ var SKScrollView = function(element) {
   var horizontalScrollBar = this.horizontalScrollBar = new SKScrollBar(this, SKScrollBarType.Horizontal);
   var verticalScrollBar = this.verticalScrollBar = new SKScrollBar(this, SKScrollBarType.Vertical);
   
+  var alwaysBounceHorizontal = $element.attr('data-always-bounce-horizontal');
+  var alwaysBounceVertical = $element.attr('data-always-bounce-vertical');
+  
+  this.alwaysBounceHorizontal = this.alwaysBounceHorizontal || (alwaysBounceHorizontal && alwaysBounceHorizontal !== 'false');
+  this.alwaysBounceVertical = this.alwaysBounceVertical || (alwaysBounceVertical && alwaysBounceVertical !== 'false');
+  
   var startDeceleration = function(startTime) {
     var acceleration = (startTime - _lastTimeStamp) / kAcceleration;
     var accelerateDeltaX = self.x - _startAccelerateX;
@@ -302,8 +308,10 @@ SKScrollView.prototype = {
   verticalScrollBar: null,
   x: 0,
   y: 0,
-  canScrollHorizontal: function() { return (this.minimumX < 0); },
-  canScrollVertical: function() { return (this.minimumY < 0); },
+  alwaysBounceHorizontal: false,
+  alwaysBounceVertical: false,
+  canScrollHorizontal: function() { return this.alwaysBounceHorizontal || (this.minimumX < 0); },
+  canScrollVertical: function() { return this.alwaysBounceVertical || (this.minimumY < 0); },
   getSize: function() {
     var $element = this.$element;
     return { width: $element.width(), height: $element.height() };
