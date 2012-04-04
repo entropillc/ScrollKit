@@ -192,9 +192,12 @@ var SKScrollView = function(element) {
     
     if (self.canScrollHorizontal()) horizontalScrollBar.update(true);
     if (self.canScrollVertical()) verticalScrollBar.update(true);
+    
+    $window.bind('mousemove touchmove', mouseMoveHandler);
+    $window.bind('mouseup touchend', mouseUpHandler);
   });
   
-  $window.bind('mousemove touchmove', function(evt) {
+  var mouseMoveHandler = function(evt) {
     if (!_isDragging) return;
     
     var mouseX, mouseY;
@@ -246,9 +249,9 @@ var SKScrollView = function(element) {
     _lastMouseY = mouseY;
     
     evt.preventDefault();
-  });
+  };
   
-  $window.bind('mouseup touchend', function(evt) {
+  var mouseUpHandler = function(evt) {
     if (!_isDragging) return;
     
     var timeStamp = evt.timeStamp;
@@ -283,7 +286,10 @@ var SKScrollView = function(element) {
     _lastMouseX = -1;
     _lastMouseY = -1;
     _lastTimeStamp = timeStamp;
-  });
+    
+    $window.unbind('mousemove touchmove', mouseMoveHandler);
+    $window.unbind('mouseup touchend', mouseUpHandler);
+  };
 };
 
 SKScrollView.prototype = {
