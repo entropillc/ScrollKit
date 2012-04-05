@@ -77,11 +77,17 @@ var SKScrollView = function(element) {
   var horizontalScrollBar = this.horizontalScrollBar = new SKScrollBar(this, SKScrollBarType.Horizontal);
   var verticalScrollBar = this.verticalScrollBar = new SKScrollBar(this, SKScrollBarType.Vertical);
   
-  var alwaysBounceHorizontal = $element.attr('data-always-bounce-horizontal');
-  var alwaysBounceVertical = $element.attr('data-always-bounce-vertical');
+  var alwaysBounceHorizontal = $element.attr('data-always-bounce-horizontal') || 'false';
+  var alwaysBounceVertical = $element.attr('data-always-bounce-vertical') || 'false';
   
-  this.alwaysBounceHorizontal = this.alwaysBounceHorizontal || (alwaysBounceHorizontal && alwaysBounceHorizontal !== 'false');
-  this.alwaysBounceVertical = this.alwaysBounceVertical || (alwaysBounceVertical && alwaysBounceVertical !== 'false');
+  this.alwaysBounceHorizontal = this.alwaysBounceHorizontal || (alwaysBounceHorizontal !== 'false');
+  this.alwaysBounceVertical = this.alwaysBounceVertical || (alwaysBounceVertical !== 'false');
+  
+  var showsHorizontalScrollIndicator = $element.attr('data-shows-horizontal-scroll-indicator') || 'true';
+  var showsVerticalScrollIndicator = $element.attr('data-shows-vertical-scroll-indicator') || 'true';
+  
+  this.showsHorizontalScrollIndicator = this.showsHorizontalScrollIndicator && (showsHorizontalScrollIndicator !== 'false');
+  this.showsVerticalScrollIndicator = this.showsVerticalScrollIndicator && (showsVerticalScrollIndicator !== 'false');
   
   var startDeceleration = function(startTime) {
     var acceleration = (startTime - _lastTimeStamp) / kAcceleration;
@@ -310,6 +316,8 @@ SKScrollView.prototype = {
   y: 0,
   alwaysBounceHorizontal: false,
   alwaysBounceVertical: false,
+  showsHorizontalScrollIndicator: true,
+  showsVerticalScrollIndicator: true,
   canScrollHorizontal: function() { return this.alwaysBounceHorizontal || (this.minimumX < 0); },
   canScrollVertical: function() { return this.alwaysBounceVertical || (this.minimumY < 0); },
   getSize: function() {
@@ -469,6 +477,15 @@ SKScrollBar.prototype = {
     });
   },
   show: function() {
+    var scrollView = this.scrollView;
+    var type = this.type;
+    
+    if ((!scrollView.showsHorizontalScrollIndicator && type === SKScrollBarType.Horizontal) ||
+        (!scrollView.showsVerticalScrollIndicator && type === SKScrollBarType.Vertical)) {
+      this.$element.removeClass('active');
+      return;
+    }
+    
     this.$element.addClass('active');
   },
   hide: function() {
@@ -477,5 +494,18 @@ SKScrollBar.prototype = {
 };
 
 $(function() {
+  var $window = $(window['addEventListener'] ? window : document.body);
+  
+  // Add a <style/> tag to the head for adjusting page sizes after a resize.
+  var $style = $('<style type="text/css"/>').appendTo($('head'));
+  var resizeHandler = function(evt) {
+    $style.html('.sk-page { width: ' + $window.width() + 'px !important; }');
+  };
+  
+  // Adjust page sizes after a resize.
+  $window.bind('resize', resizeHandler);
+  resizeHandler();
+  
+  // Initialize all ScrollViews.
   $('.sk-scroll-view').each(function(index, element) { new SKScrollView(element); });
 });
