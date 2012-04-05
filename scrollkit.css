@@ -122,7 +122,10 @@ body {
 
 .sk-page {
   display: inline-block;
+  float: left;
   list-style-type: none;
+  margin: 0;
+  padding: 0;
   white-space: normal;
   width: 100%;
   height: 100%;

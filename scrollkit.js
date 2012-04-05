@@ -32,7 +32,8 @@
 
 var SKScrollEventType = {
   ScrollStart: 'SKScrollStart',
-  ScrollEnd: 'SKScrollEnd'
+  ScrollEnd: 'SKScrollEnd',
+  PageChanged: 'SKPageChanged'
 };
 
 var SKScrollBarType = {
@@ -49,6 +50,7 @@ var SKScrollView = function(element) {
   var kMinimumDecelerationVelocity = 1;
   var kDecelerationFactor = 0.95;
   var kMinimumVelocity = 0.01;
+  var kMinimumPageTurnVelocity = 5;
   var kScrollBarHideTimeout = 100;
   
   var _isDragging = false;
@@ -79,15 +81,16 @@ var SKScrollView = function(element) {
   
   var alwaysBounceHorizontal = $element.attr('data-always-bounce-horizontal') || 'false';
   var alwaysBounceVertical = $element.attr('data-always-bounce-vertical') || 'false';
-  
-  this.alwaysBounceHorizontal = this.alwaysBounceHorizontal || (alwaysBounceHorizontal !== 'false');
-  this.alwaysBounceVertical = this.alwaysBounceVertical || (alwaysBounceVertical !== 'false');
+  alwaysBounceHorizontal = this.alwaysBounceHorizontal = this.alwaysBounceHorizontal || (alwaysBounceHorizontal !== 'false');
+  alwaysBounceVertical = this.alwaysBounceVertical = this.alwaysBounceVertical || (alwaysBounceVertical !== 'false');
   
   var showsHorizontalScrollIndicator = $element.attr('data-shows-horizontal-scroll-indicator') || 'true';
   var showsVerticalScrollIndicator = $element.attr('data-shows-vertical-scroll-indicator') || 'true';
+  showsHorizontalScrollIndicator = this.showsHorizontalScrollIndicator = this.showsHorizontalScrollIndicator && (showsHorizontalScrollIndicator !== 'false');
+  showsVerticalScrollIndicator = this.showsVerticalScrollIndicator = this.showsVerticalScrollIndicator && (showsVerticalScrollIndicator !== 'false');
   
-  this.showsHorizontalScrollIndicator = this.showsHorizontalScrollIndicator && (showsHorizontalScrollIndicator !== 'false');
-  this.showsVerticalScrollIndicator = this.showsVerticalScrollIndicator && (showsVerticalScrollIndicator !== 'false');
+  var pagingEnabled = $element.attr('data-paging-enabled') || 'false';
+  pagingEnabled = this.pagingEnabled = this.pagingEnabled || (pagingEnabled !== 'false');
   
   var startDeceleration = function(startTime) {
     var acceleration = (startTime - _lastTimeStamp) / kAcceleration;
@@ -266,6 +269,7 @@ var SKScrollView = function(element) {
   var mouseUpHandler = function(evt) {
     if (!_isDragging) return;
     
+    var pagingEnabled = self.pagingEnabled;
     var timeStamp = evt.timeStamp;
     var accelerationTime = timeStamp - _lastTimeStamp;
     var x = Math.min(Math.max(self.minimumX, self.x), 0);
@@ -282,16 +286,39 @@ var SKScrollView = function(element) {
       self.y = _startAccelerateY = !self.canScrollVertical() ? 0 : y;
     };
     
-    if (accelerationTime < kAccelerationTimeout) {
-      if (x !== self.x || y !== self.y) {
+    if (pagingEnabled) {
+      var acceleration = (timeStamp - _lastTimeStamp) / kAcceleration;
+      var accelerateDeltaX = self.x - _startAccelerateX;
+      var velocityX = accelerateDeltaX / acceleration;      
+      var pageWidth = $window.width();
+      var pageIndex = Math.round(x / pageWidth);
+      var pageCount = Math.floor(self.content.getSize().width / pageWidth);
+      var previousPage = self.currentPage;
+      var currentPage = Math.abs(pageIndex);
+      
+      if (previousPage === currentPage && Math.abs(velocityX) > kMinimumPageTurnVelocity) currentPage += (velocityX > 0) ? -1 : 1;
+      
+      currentPage = Math.min(Math.max(currentPage, 0), pageCount - 1);
+      x = -currentPage * pageWidth;
+      self.currentPage = currentPage;
+      
+      bounce();
+      
+      $element.trigger(SKScrollEventType.PageChanged);
+    }
+    
+    else {
+      if (accelerationTime < kAccelerationTimeout) {
+        if (x !== self.x || y !== self.y) {
+          bounce();
+        } else {
+          startDeceleration(timeStamp);
+        }
+      } else if (x !== self.x || y !== self.y) {
         bounce();
       } else {
-        startDeceleration(timeStamp);
+        scrollEnd();
       }
-    } else if (x !== self.x || y !== self.y) {
-      bounce();
-    } else {
-      scrollEnd();
     }
     
     _isDragging = false;
@@ -318,6 +345,8 @@ SKScrollView.prototype = {
   alwaysBounceVertical: false,
   showsHorizontalScrollIndicator: true,
   showsVerticalScrollIndicator: true,
+  pagingEnabled: false,
+  currentPage: 0,
   canScrollHorizontal: function() { return this.alwaysBounceHorizontal || (this.minimumX < 0); },
   canScrollVertical: function() { return this.alwaysBounceVertical || (this.minimumY < 0); },
   getSize: function() {
