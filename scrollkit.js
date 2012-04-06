@@ -528,7 +528,7 @@ $(function() {
   // Add a <style/> tag to the head for adjusting page sizes after a resize.
   var $style = $('<style type="text/css"/>').appendTo($('head'));
   var resizeHandler = function(evt) {
-    $style.html('.sk-page { width: ' + $window.width() + 'px !important; }');
+    $style.html('.sk-page-container-horizontal > li { width: ' + $window.width() + 'px !important; }');
   };
   
   // Adjust page sizes after a resize.

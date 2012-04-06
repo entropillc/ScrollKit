@@ -108,6 +108,7 @@ body {
 
 .sk-page-container-horizontal {
   display: inline-block;
+  float: left;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -120,7 +121,7 @@ body {
   position: relative;
 }
 
-.sk-page {
+.sk-page-container-horizontal > li {
   display: inline-block;
   float: left;
   list-style-type: none;
