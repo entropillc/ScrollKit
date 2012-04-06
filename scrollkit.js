@@ -352,6 +352,15 @@ SKScrollView.prototype = {
   getSize: function() {
     var $element = this.$element;
     return { width: $element.width(), height: $element.height() };
+  },
+  setContentOffset: function(contentOffset, animated) {
+    if (!contentOffset || contentOffset['x'] === undefined || contentOffset['y'] === undefined) return;
+    
+    var x = this.x = -contentOffset.x;
+    var y = this.y = -contentOffset.y;
+    var duration = (animated) ? kBounceTransitionDuration : 0;
+    
+    this.content.translate(x, y, duration);
   }
 };
 
