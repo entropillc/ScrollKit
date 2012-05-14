@@ -33,6 +33,7 @@
 var SKScrollEventType = {
   ScrollStart: 'SKScrollStart',
   ScrollEnd: 'SKScrollEnd',
+  ScrollChange: 'SKScrollChange',
   PageChanged: 'SKPageChanged'
 };
 
@@ -353,6 +354,9 @@ SKScrollView.prototype = {
     var $element = this.$element;
     return { width: $element.width(), height: $element.height() };
   },
+  getContentOffset: function() {
+    return { x: -this.x, y: -this.y };
+  },
   setContentOffset: function(contentOffset, animated) {
     if (!contentOffset || contentOffset['x'] === undefined || contentOffset['y'] === undefined) return;
     
@@ -360,7 +364,16 @@ SKScrollView.prototype = {
     var y = this.y = -contentOffset.y;
     var duration = (animated) ? kBounceTransitionDuration : 0;
     
+    if (this.canScrollHorizontal()) this.horizontalScrollBar.update(true);
+    if (this.canScrollVertical()) this.verticalScrollBar.update(true);
+    
     this.content.translate(x, y, duration);
+  },
+  getMargin: function() { return this.content.margin; },
+  setMargin: function(margin) {
+    var content = this.content;
+    content.margin = margin;
+    content.translate(this.x, this.y);
   }
 };
 
@@ -377,13 +390,16 @@ SKScrollContent.prototype = {
   element: null,
   $element: null,
   scrollView: null,
+  margin: { top: 0, bottom: 0 },
   getSize: function() {
     var $element = this.$element;
-    return { width: $element.width(), height: $element.height() };
+    var margin = this.margin;
+    return { width: $element.width(), height: $element.height() + margin.top + margin.bottom };
   },
   translate: function(x, y, duration) {
-    var translate3d = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
-    var translate = 'translate(' + x + 'px, ' + y + 'px)';
+    var marginTop = this.margin.top;
+    var translate3d = 'translate3d(' + x + 'px, ' + (y + marginTop) + 'px, 0)';
+    var translate = 'translate(' + x + 'px, ' + (y + marginTop) + 'px)';
     
     duration = (duration) ? duration + 's' : '0s';
     
@@ -404,6 +420,8 @@ SKScrollContent.prototype = {
     
     if (scrollView.canScrollHorizontal()) scrollView.horizontalScrollBar.update();
     if (scrollView.canScrollVertical()) scrollView.verticalScrollBar.update();
+    
+    scrollView.$element.trigger(SKScrollEventType.ScrollChange);
   }
 };
 
