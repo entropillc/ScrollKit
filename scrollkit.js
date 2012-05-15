@@ -451,7 +451,7 @@ SKScrollBar.prototype = {
   $element: null,
   scrollView: null,
   type: SKScrollBarType.Horizontal,
-  minimumSize: 34,
+  minimumSize: 12,
   thickness: 0,
   setSize: function(value) {
     this._size = value;
