@@ -64,6 +64,7 @@ var SKScrollView = function(element) {
   var _lastTouchIdentifier = 0;
   var _lastTimeStamp = Date.now();
   var _decelerationAnimationInterval = null;
+  var _mouseWheelTimeout = null;
   
   var $window = $(window['addEventListener'] ? window : document.body);
   
@@ -181,6 +182,46 @@ var SKScrollView = function(element) {
     $element.unbind(evt);
     scrollEnd();
   };
+  
+  $element.bind('mousewheel DOMMouseScroll', function(evt) {
+    window.clearTimeout(_mouseWheelTimeout);
+    
+    var originalEvent = evt.originalEvent;
+    var detail = originalEvent.detail;
+    var delta = originalEvent.wheelDelta;
+    var normalizedDelta = (detail) ? ((delta) ? ((delta / detail / 40 * detail > 0) ? 1 : -1) : -detail / 3) : delta / 120;
+    
+    var scrollViewSize = self.getSize();
+    var contentSize = content.getSize();
+    
+    self.minimumX = scrollViewSize.width - contentSize.width;
+    self.minimumY = scrollViewSize.height - contentSize.height;
+    
+    var deltaX = 0;
+    var deltaY = normalizedDelta * 8;
+    
+    var x = self.x + deltaX;
+    var y = self.y + deltaY;
+    
+    x = (x < self.minimumX) ? self.minimumX : (x > 0) ? 0 : x;
+    y = (y < self.minimumY) ? self.minimumY : (y > 0) ? 0 : y;
+    x = self.x = !self.canScrollHorizontal() ? 0 : x;
+    y = self.y = !self.canScrollVertical() ? 0 : y;
+    
+    if (!_isScrolling && ((self.canScrollHorizontal() && deltaX !== 0) ||
+        (self.canScrollVertical() && deltaY !== 0))) scrollStart();
+    
+    content.translate(x, y);
+    
+    if (self.canScrollHorizontal() && deltaX !== 0) horizontalScrollBar.update(true);
+    if (self.canScrollVertical() && deltaY !== 0) verticalScrollBar.update(true);
+    
+    _mouseWheelTimeout = window.setTimeout(function() {
+      scrollEnd();
+    }, kAccelerationTimeout);
+    
+    evt.preventDefault();
+  });
   
   $element.bind('mousedown touchstart', function(evt) {
     var scrollViewSize = self.getSize();
