@@ -527,8 +527,8 @@ SKScrollBar.prototype = {
       scrollViewSize = this._scrollViewSize = scrollView.getSize();
       contentSize = this._contentSize = content.getSize();
     } else {
-      scrollViewSize = this._scrollViewSize;
-      contentSize = this._contentSize;
+      scrollViewSize = this._scrollViewSize || scrollView.getSize();
+      contentSize = this._contentSize || content.getSize();
     }
     
     var canScrollHorizontal = scrollView.canScrollHorizontal();
