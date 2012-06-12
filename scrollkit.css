@@ -56,6 +56,11 @@ body {
   -webkit-box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6); /* NOTE: Possible performance implications on some devices/browsers. */
   -moz-box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
   box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+  backface-visibility: hidden;
   -webkit-transition-duration: 0s;
   -moz-transition-duration: 0s;
   -ms-transition-duration: 0s;
