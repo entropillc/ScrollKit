@@ -9,14 +9,14 @@ Usage
 Simply drop the CSS onto any page:
 
 ``` html
-<link rel="stylesheet" type="text/css" href="scrollkit.css"/>
+<link rel="stylesheet" href="scrollkit.css"/>
 ```
 
 Then, include the JavaScript with jQuery:
 
 ``` html
-<script type="text/javascript" src="jquery-1.7.1.js"></script>
-<script type="text/javascript" src="scrollkit.js"></script>
+<script src="jquery-1.7.2.js"></script>
+<script src="scrollkit.js"></script>
 ```
 
 See the included demo page for usage.
