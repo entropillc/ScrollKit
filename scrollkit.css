@@ -26,6 +26,7 @@ body {
 
 .sk-scroll-view {
   background: #333 url('background.png');
+  background-size: 256px 256px;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -40,6 +41,12 @@ body {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2) {
+  .sk-scroll-view {
+    background: #333 url('background@2x.png');
+  }
 }
 
 .sk-scroll-content {

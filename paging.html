@@ -10,11 +10,10 @@
   <script>
     $(function() {
       var scrollEventTypes = [];
-      for (var eventType in SKScrollEventType) scrollEventTypes.push(SKScrollEventType[eventType]);
+      for (var eventType in ScrollKit.ScrollView.EventType) scrollEventTypes.push(ScrollKit.ScrollView.EventType[eventType]);
       scrollEventTypes = scrollEventTypes.join(' ');
       $('.sk-scroll-view').bind(scrollEventTypes, function(evt) {
-        if (evt.type !== SKScrollEventType.ScrollChange)
-        console.log(evt.type);
+        if (evt.type !== ScrollKit.ScrollView.EventType.ScrollChange) console.log(evt.type);
       });
     });
   </script>
