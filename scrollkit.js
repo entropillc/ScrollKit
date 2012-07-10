@@ -118,8 +118,8 @@ ScrollKit.ScrollView = function ScrollView(element) {
     var distancePastBoundsX = (x < minimumX) ? minimumX - x : ((x > 0) ? x : 0);
     var distancePastBoundsY = (y < minimumY) ? minimumY - y : ((y > 0) ? y : 0);
     
-    if (distancePastBoundsX > 0) x -= distancePastBoundsX / deltaX;
-    if (distancePastBoundsY > 0) y -= distancePastBoundsY / deltaY;
+    if (distancePastBoundsX > 0) x -= deltaX / 4;
+    if (distancePastBoundsY > 0) y -= deltaY / 4;
     
     if (self.getPullToRefresh() && y >= $pullToRefresh.height() - 1) {
       y = $pullToRefresh.height() - 1;
@@ -460,7 +460,7 @@ ScrollKit.ScrollView.prototype = {
   kDecelerationFactor: 0.95,
   kMinimumVelocity: 0.01,
   kMinimumPageTurnVelocity: 5,
-  kMouseWheelTimeout: 80,
+  kMouseWheelTimeout: 50,
   
   _scrollContent: null,
   
