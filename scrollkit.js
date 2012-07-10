@@ -28,6 +28,10 @@ ScrollKit.ScrollView = function ScrollView(element) {
   var $scrollContent = $('<div class="sk-scroll-content"/>').append($element.contents()).appendTo($element);  
   this.setScrollContent(new ScrollKit.ScrollContent($scrollContent, this));
   
+  // Add the "pull to refresh" element above the scroll content element.
+  var $pullToRefresh = this.$pullToRefresh = $('<div class="sk-pull-to-refresh sk-hidden"/>').appendTo($scrollContent);
+  $pullToRefresh.append('<span class="sk-pull-to-refresh-message">Pull To Refresh</span>').append('<span class="sk-pull-to-refresh-arrow"/>');
+  
   // Set the initial scroll offset.
   this._scrollOffset = { x: 0, y: 0 };
   
@@ -50,6 +54,10 @@ ScrollKit.ScrollView = function ScrollView(element) {
   var pagingEnabled = $element.attr('data-paging-enabled') || 'false';
   this.setPagingEnabled(pagingEnabled = pagingEnabled !== 'false');
   
+  // Determine if the scroll view has a "pull to refresh" area.
+  var pullToRefresh = $element.attr('data-pull-to-refresh') || 'false';
+  this.setPullToRefresh(pullToRefresh = pullToRefresh !== 'false');
+  
   // Get values for the constants used for the scroll physics.
   var kBounceTransitionDuration = this.kBounceTransitionDuration;
   var kAccelerationTimeout = this.kAccelerationTimeout;
@@ -60,6 +68,7 @@ ScrollKit.ScrollView = function ScrollView(element) {
   var kDecelerationFactor = this.kDecelerationFactor;
   var kMinimumVelocity = this.kMinimumVelocity;
   var kMinimumPageTurnVelocity = this.kMinimumPageTurnVelocity;
+  var kMouseWheelTimeout = this.kMouseWheelTimeout;
   
   // Declare variables to store the state.
   var startAccelerateX = 0;
@@ -106,8 +115,16 @@ ScrollKit.ScrollView = function ScrollView(element) {
     var x = scrollOffset.x + deltaX;
     var y = scrollOffset.y + deltaY;
     
-    x = (x < minimumX) ? minimumX : (x > 0) ? 0 : x;
-    y = (y < minimumY) ? minimumY : (y > 0) ? 0 : y;
+    var distancePastBoundsX = (x < minimumX) ? minimumX - x : ((x > 0) ? x : 0);
+    var distancePastBoundsY = (y < minimumY) ? minimumY - y : ((y > 0) ? y : 0);
+    
+    if (distancePastBoundsX > 0) x -= distancePastBoundsX / deltaX;
+    if (distancePastBoundsY > 0) y -= distancePastBoundsY / deltaY;
+    
+    if (self.getPullToRefresh() && y >= $pullToRefresh.height() - 1) {
+      y = $pullToRefresh.height() - 1;
+      $pullToRefresh.addClass('sk-active');
+    }
     
     self.setScrollOffset({
       x: shouldScrollHorizontal ? x : 0,
@@ -128,7 +145,22 @@ ScrollKit.ScrollView = function ScrollView(element) {
     
     if (shouldStartScroll) beforeScrollStart();
     
-    mouseWheelTimeout = window.setTimeout(function() { beforeScrollEnd(); }, kAccelerationTimeout);
+    mouseWheelTimeout = window.setTimeout(function() {      
+      x = (x < minimumX) ? minimumX : (x > 0) ? 0 : x;
+      y = (y < minimumY) ? minimumY : (y > 0) ? 0 : y;
+      
+      if (self.getPullToRefresh() && $pullToRefresh.hasClass('sk-active')) {
+        $pullToRefresh.removeClass('sk-active');
+        $element.trigger(ScrollKit.ScrollView.EventType.DidPullToRefresh);
+      }
+      
+      self.setScrollOffset({
+        x: shouldScrollHorizontal ? x : 0,
+        y: shouldScrollVertical ? y : 0
+      }, kBounceTransitionDuration);
+      
+      beforeScrollEnd();
+    }, kMouseWheelTimeout);
   });
   
   var mouseDownHandler = function(evt) {
@@ -202,6 +234,15 @@ ScrollKit.ScrollView = function ScrollView(element) {
     x -= ((x < self.getMinimumX()) ? deltaX : (x > 0) ? deltaX : 0) / 2;
     y -= ((y < self.getMinimumY()) ? deltaY : (y > 0) ? deltaY : 0) / 2;
     
+    if (self.getPullToRefresh()) {
+      if (y >= $pullToRefresh.height() - 1) {
+        y = $pullToRefresh.height() - 1;
+        $pullToRefresh.addClass('sk-active');
+      } else {
+        $pullToRefresh.removeClass('sk-active');
+      }
+    }
+    
     self.setScrollOffset({
       x: shouldScrollHorizontal ? x : 0,
       y: shouldScrollVertical ? y : 0
@@ -254,6 +295,11 @@ ScrollKit.ScrollView = function ScrollView(element) {
       
       if (shouldScrollHorizontal) horizontalScrollBar.setHidden(true);
       if (shouldScrollVertical) verticalScrollBar.setHidden(true);
+      
+      if (self.getPullToRefresh() && $pullToRefresh.hasClass('sk-active')) {
+        $pullToRefresh.removeClass('sk-active');
+        $element.trigger(ScrollKit.ScrollView.EventType.DidPullToRefresh);
+      }
     };
     
     if (self.getPagingEnabled()) {
@@ -393,7 +439,8 @@ ScrollKit.ScrollView.EventType = {
   ScrollChange: 'ScrollKit:ScrollView:ScrollChange',
   WillScrollToTop: 'ScrollKit:ScrollView:WillScrollToTop',
   DidScrollToTop: 'ScrollKit:ScrollView:DidScrollToTop',
-  PageChanged: 'ScrollKit:ScrollView:PageChanged'
+  PageChanged: 'ScrollKit:ScrollView:PageChanged',
+  DidPullToRefresh: 'ScrollKit:ScrollView:DidPullToRefresh'
 };
 
 ScrollKit.ScrollView.prototype = {
@@ -401,6 +448,8 @@ ScrollKit.ScrollView.prototype = {
   
   element: null,
   $element: null,
+  
+  $pullToRefresh: null,
   
   kBounceTransitionDuration: 0.35,
   kAccelerationTimeout: 250,
@@ -411,6 +460,7 @@ ScrollKit.ScrollView.prototype = {
   kDecelerationFactor: 0.95,
   kMinimumVelocity: 0.01,
   kMinimumPageTurnVelocity: 5,
+  kMouseWheelTimeout: 80,
   
   _scrollContent: null,
   
@@ -571,6 +621,30 @@ ScrollKit.ScrollView.prototype = {
     @param {Boolean} pagingEnabled The flag indicating if this scroll view should snap at each "page" of content.
   */
   setPagingEnabled: function(pagingEnabled) { this._pagingEnabled = pagingEnabled; },
+  
+  _pullToRefresh: false,
+  
+  /**
+    Returns a flag indicating if this scroll view contains a "pull to refresh" area at the
+    top of the scroll content.
+    @type Boolean
+  */
+  getPullToRefresh: function() { return this._pullToRefresh; },
+  
+  /**
+    Sets a flag indicating if this scroll view contains a "pull to refresh" area at the
+    top of the scroll content.
+    @param {Boolean} pagingEnabled The flag indicating if this scroll view contains a "pull to refresh" area.
+  */
+  setPullToRefresh: function(pullToRefresh) {
+    this._pullToRefresh = pullToRefresh;
+    
+    if (pullToRefresh) {
+      this.$pullToRefresh.removeClass('sk-hidden');
+    } else {
+      this.$pullToRefresh.addClass('sk-hidden');
+    }
+  },
   
   _currentPageIndex: 0,
   
