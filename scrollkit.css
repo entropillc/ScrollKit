@@ -44,11 +44,6 @@ body {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -ms-backface-visibility: hidden;
-  -o-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
