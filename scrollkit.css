@@ -6,11 +6,12 @@
 }
 
 html {
+  font-size: 100%;
   width: 100%;
   height: 100%;
-  overflow: hidden;
   margin: 0;
-  font-size: 100%;  
+  padding: 0;
+  overflow: hidden;
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -19,9 +20,12 @@ html {
 }
 
 body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   margin: 0;
-  font-size: 13px;
-  line-height: 1.231;
+  padding: 0;
+  overflow: hidden;
 }
 
 .sk-scroll-view {
@@ -35,12 +39,16 @@ body {
   padding: 0;
   margin: 0;
   overflow: hidden;
-  -webkit-overflow-scrolling: touch;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
@@ -54,8 +62,8 @@ body {
   position: absolute;
   min-width: 100%;
   width: auto;
-  height: 57px;
-  top: -56px;
+  height: 4em;
+  top: -3.95em;
   left: 0;
   text-align: center;
   -webkit-backface-visibility: hidden;
@@ -83,8 +91,8 @@ body {
   border: 0.6em solid #555;
   display: inline-block;
   position: relative;
-  margin: 1.75em 0.8em 0 0.8em;
-  padding-top: 0.4em;
+  margin: 1.5em 1em 0;
+  padding-top: 0.5em;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   -ms-backface-visibility: hidden;
@@ -146,9 +154,9 @@ body {
   left: 0;
   padding: 0;
   margin: 0;
-  -webkit-box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6); /* NOTE: Possible performance implications on some devices/browsers. */
-  -moz-box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
-  box-shadow: 0 -2px 16px 6px rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.5); /* NOTE: Possible performance implications on some devices/browsers. */
+  -moz-box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.5);
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   -ms-backface-visibility: hidden;
