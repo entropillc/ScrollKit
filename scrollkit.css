@@ -74,20 +74,27 @@ body {
 }
 
 .sk-pull-to-refresh .sk-pull-to-refresh-message {
-  color: #555;
+  color: #777;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.1em;
   font-weight: bold;
-  margin: 1em;
+  display: inline-block;
+  margin: 1.4em 0 0;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .sk-pull-to-refresh .sk-pull-to-refresh-arrow {
-  border: 0.6em solid #555;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(155,155,155,0)), color-stop(100%,rgba(155,155,155,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  rgba(155,155,155,0) 0%,rgba(155,155,155,1) 100%); /* Chrome10+,Safari5.1+ */
   display: inline-block;
-  position: relative;
-  margin: 1.5em 1em 0;
-  padding-top: 0.5em;
+  font-family: PushpopGlyphs;
+  font-size: 4.4em;
+  text-align: center;
+  line-height: 1em;
+  margin: 0 0 0 -1.5em;
+  position: absolute;
+  width: 1em;
+  height: 1em;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   -ms-backface-visibility: hidden;
@@ -103,39 +110,21 @@ body {
   -ms-transition: -ms-transform 0.2s ease;
   -o-transition: -o-transform 0.2s ease;
   transition: transform 0.2s ease;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .sk-pull-to-refresh .sk-pull-to-refresh-arrow::before {
-  border: 1.2em solid transparent;
-  border-bottom-color: inherit;
-  content: '';
-  display: inline-block;
-  position: absolute;
-  top: -2.8em;
-  left: -1.2em;
-}
-
-.sk-pull-to-refresh .sk-pull-to-refresh-arrow::after {
-  border: 0.6em solid transparent;
-  border-color: inherit;
-  content: '';
-  display: inline-block;
-  position: absolute;
-  top: 0.9em;
-  left: -0.6em;
-  -webkit-transform: scaleY(0.4);
-  -moz-transform: scaleY(0.4);
-  -ms-transform: scaleY(0.4);
-  -o-transform: scaleY(0.4);
-  transform: scaleY(0.4);
+  content: '\f018';
+  color: #9b9b9b;
 }
 
 .sk-pull-to-refresh.sk-active .sk-pull-to-refresh-arrow {
-  -webkit-transform: translate3d(0, 0, 0) rotate3d(0, 0, 1, 180deg);
-  -moz-transform: translate(0, 0) rotate(180deg);
-  -ms-transform: translate(0, 0) rotate(180deg);
-  -o-transform: translate(0, 0) rotate(180deg);
-  transform: translate(0, 0) rotate(180deg);
+  -webkit-transform: translate3d(0, 0, 0) rotate3d(0, 0, 1, -180deg);
+  -moz-transform: translate(0, 0) rotate(-180deg);
+  -ms-transform: translate(0, 0) rotate(-180deg);
+  -o-transform: translate(0, 0) rotate(-180deg);
+  transform: translate(0, 0) rotate(-180deg);
 }
 
 .sk-scroll-content {

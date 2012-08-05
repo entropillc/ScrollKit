@@ -30,7 +30,7 @@ ScrollKit.ScrollView = function ScrollView(element) {
   
   // Add the "pull to refresh" element above the scroll content element.
   var $pullToRefresh = this.$pullToRefresh = $('<div class="sk-pull-to-refresh sk-hidden"/>').appendTo($scrollContent);
-  $pullToRefresh.append('<span class="sk-pull-to-refresh-message">Pull To Refresh</span>').append('<span class="sk-pull-to-refresh-arrow"/>');
+  $pullToRefresh.append('<span class="sk-pull-to-refresh-arrow"/>').append('<span class="sk-pull-to-refresh-message">Pull To Refresh</span>');
   
   // Set the initial scroll offset.
   this._scrollOffset = { x: 0, y: 0 };
