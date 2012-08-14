@@ -124,9 +124,9 @@ ScrollKit.ScrollView = function ScrollView(element) {
   var scrollPosition = this._scrollPosition = { x: 0, y: 0 };
   var maximumScrollPosition = this._maximumScrollPosition = { x: 0, y: 0 };
   var pageIndexes = this._pageIndexes = { horizontal: 0, vertical: 0 };
-
+  
   this.recalculateDimensions();
-
+  
   var isTouchSupported = !!('ontouchstart' in window);
   if (!isTouchSupported && !useMouseDragScrolling) {
     $element.css('overflow', 'auto');
@@ -715,6 +715,8 @@ ScrollKit.ScrollView.prototype = {
     } else {
       this.$content.css('padding', margin.top + 'px ' + margin.right + 'px ' + margin.bottom + 'px ' + margin.left + 'px');
     }
+    
+    this.recalculateDimensions();
   },
 
   _scrollPosition: null, // { x: 0, y: 0 }
@@ -864,8 +866,8 @@ ScrollKit.ScrollView.prototype = {
     size.width = $element.width();
     size.height = $element.height();
     
-    contentSize.width = $content.width() + margin.left + margin.right;
-    contentSize.height = $content.height() + margin.top + margin.bottom;
+    contentSize.width = Math.max($content.width(), size.width) + margin.left + margin.right;
+    contentSize.height = Math.max($content.height(), size.height) + margin.top + margin.bottom;
     
     maximumScrollPosition.x = contentSize.width - size.width;
     maximumScrollPosition.y = contentSize.height - size.height;
