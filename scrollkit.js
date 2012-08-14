@@ -730,6 +730,7 @@ ScrollKit.ScrollView.prototype = {
 
   */
   setScrollPosition: function(x, y, animationDuration) {
+    var $element = this.$element;
     var scrollPosition = this._scrollPosition;
     var minimumDeltaForScrollEvent = ScrollKit.Params.minimumDeltaForScrollEvent;
     var shouldTriggerScrollEvent = (Math.abs(scrollPosition.x - x) > minimumDeltaForScrollEvent || Math.abs(scrollPosition.y - y) > minimumDeltaForScrollEvent);
@@ -737,6 +738,12 @@ ScrollKit.ScrollView.prototype = {
     x = scrollPosition.x = (this.getShouldScrollHorizontal()) ? x : 0;
     y = scrollPosition.y = (this.getShouldScrollVertical()) ? y : 0;
 
+    if (!this._useMouseDragScrolling) {
+      $element.scrollLeft(x)
+      $element.scrollTop(y);
+      return;
+    }
+    
     this.translate(x, y, animationDuration);
     
     if (!shouldTriggerScrollEvent) return;
@@ -744,7 +751,7 @@ ScrollKit.ScrollView.prototype = {
     this.updateHorizontalScrollIndicator();
     this.updateVerticalScrollIndicator();
     
-    this.$element.trigger('scroll');
+    $element.trigger('scroll');
   },
   
   /**
