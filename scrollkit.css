@@ -6,20 +6,21 @@
 }
 
 html {
-  font-size: 100%;
+  background: #000;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
   -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  -o-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+     -moz-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+       -o-text-size-adjust: 100%;
+          text-size-adjust: 100%;
 }
 
 body {
+  background: #000;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -36,14 +37,24 @@ body {
   height: 100%;
   top: 0;
   left: 0;
-  padding: 0;
   margin: 0;
+  padding: 0;
   overflow: hidden;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+       -o-user-select: none;
+          user-select: none;
+  -webkit-backface-visibility: hidden;
+     -moz-backface-visibility: hidden;
+      -ms-backface-visibility: hidden;
+       -o-backface-visibility: hidden;
+          backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+     -moz-transform:   translate(0, 0);
+      -ms-transform:   translate(0, 0);
+       -o-transform:   translate(0, 0);
+          transform:   translate(0, 0);
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
@@ -52,79 +63,27 @@ body {
   }
 }
 
-.sk-pull-to-refresh {
+.sk-scroll-view.sk-scroll-view-plain, .sk-scroll-view.sk-scroll-view-plain > .sk-scroll-content {
+  background: none;
+}
+
+.sk-scroll-view::-webkit-scrollbar {
   background: #ddd;
-  position: absolute;
-  min-width: 100%;
-  width: auto;
-  height: 4em;
-  top: -3.95em;
-  left: 0;
-  text-align: center;
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -ms-backface-visibility: hidden;
-  -o-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
-  -o-transform: translate(0, 0);
-  transform: translate(0, 0);
+  width: 12px;
+  height: 12px;
 }
 
-.sk-pull-to-refresh .sk-pull-to-refresh-message {
-  color: #777;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 1.1em;
-  font-weight: bold;
-  display: inline-block;
-  margin: 1.4em 0 0;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+.sk-scroll-view::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-border-radius: 10px;
+          border-radius: 10px;
 }
 
-.sk-pull-to-refresh .sk-pull-to-refresh-arrow {
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(155,155,155,0)), color-stop(100%,rgba(155,155,155,1))); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  rgba(155,155,155,0) 0%,rgba(155,155,155,1) 100%); /* Chrome10+,Safari5.1+ */
-  display: inline-block;
-  font-family: PushpopGlyphs;
-  font-size: 4.4em;
-  text-align: center;
-  line-height: 1em;
-  margin: 0 0 0 -1.5em;
-  position: absolute;
-  width: 1em;
-  height: 1em;
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -ms-backface-visibility: hidden;
-  -o-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform: translate3d(0, 0, 0) rotate3d(0, 0, 1, 0deg);
-  -moz-transform: translate(0, 0) rotate(0deg);
-  -ms-transform: translate(0, 0) rotate(0deg);
-  -o-transform: translate(0, 0) rotate(0deg);
-  transform: translate(0, 0) rotate(0deg);
-  -webkit-transition: -webkit-transform 0.2s ease;
-  -moz-transition: -moz-transform 0.2s ease;
-  -ms-transition: -ms-transform 0.2s ease;
-  -o-transition: -o-transform 0.2s ease;
-  transition: transform 0.2s ease;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.sk-pull-to-refresh .sk-pull-to-refresh-arrow::before {
-  content: '\f018';
-  color: #9b9b9b;
-}
-
-.sk-pull-to-refresh.sk-active .sk-pull-to-refresh-arrow {
-  -webkit-transform: translate3d(0, 0, 0) rotate3d(0, 0, 1, -180deg);
-  -moz-transform: translate(0, 0) rotate(-180deg);
-  -ms-transform: translate(0, 0) rotate(-180deg);
-  -o-transform: translate(0, 0) rotate(-180deg);
-  transform: translate(0, 0) rotate(-180deg);
+.sk-scroll-view::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px 0 rgba(0, 0, 0, 0.3);
+          box-shadow: inset 0 0 6px 0 rgba(0, 0, 0, 0.3); 
+  -webkit-border-radius: 10px;
+          border-radius: 10px;
 }
 
 .sk-scroll-content {
@@ -136,64 +95,61 @@ body {
   height: auto;
   top: 0;
   left: 0;
-  padding: 0;
   margin: 0;
-  -webkit-box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.5); /* NOTE: Possible performance implications on some devices/browsers. */
-  -moz-box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.5);
+  padding: 0;
+  overflow: visible;
   -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -ms-backface-visibility: hidden;
-  -o-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transition-duration: 0s;
-  -moz-transition-duration: 0s;
-  -ms-transition-duration: 0s;
-  -o-transition-duration: 0s;
-  transition-duration: 0s;
+     -moz-backface-visibility: hidden;
+      -ms-backface-visibility: hidden;
+       -o-backface-visibility: hidden;
+          backface-visibility: hidden;
   -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
-  -o-transform: translate(0, 0);
-  transform: translate(0, 0);
+     -moz-transform:   translate(0, 0);
+      -ms-transform:   translate(0, 0);
+       -o-transform:   translate(0, 0);
+          transform:   translate(0, 0);
+  -webkit-transition: -webkit-transform 0s ease;
+     -moz-transition:    -moz-transform 0s ease;
+      -ms-transition:     -ms-transform 0s ease;
+       -o-transition:      -o-transform 0s ease;
+          transition:         transform 0s ease;
 }
 
-.sk-scroll-view.sk-scroll-view-plain, .sk-scroll-view.sk-scroll-view-plain > .sk-scroll-content {
-  background: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-
-.sk-scroll-bar {
-  background: rgba(0, 0, 0, 0.5);
+.sk-scroll-indicator {
+  background: rgba(0, 0, 0, 1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   position: absolute;
   width: 5px;
   height: 5px;
   margin: 2px;
-  opacity: 0;
-  -webkit-border-radius: 8px / 10px;
-  -moz-border-radius: 8px / 10px;
-  border-radius: 8px / 10px;
-  -webkit-transition-duration: 0.3s, 0s;
-  -moz-transition-duration: 0.3s, 0s;
-  -ms-transition-duration: 0.3s, 0s;
-  -o-transition-duration: 0.3s, 0s;
-  transition-duration: 0.3s, 0s;
-  -webkit-transition-property: opacity, -webkit-transform;
-  -moz-transition-property: opacity, -moz-transform;
-  -ms-transition-property: opacity, -ms-transform;
-  -o-transition-property: opacity, -o-transform;
-  transition-property: opacity, transform;
+  opacity: 0.5;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+  -webkit-backface-visibility: hidden;
+     -moz-backface-visibility: hidden;
+      -ms-backface-visibility: hidden;
+       -o-backface-visibility: hidden;
+          backface-visibility: hidden;
   -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
-  -o-transform: translate(0, 0);
-  transform: translate(0, 0);
+     -moz-transform:   translate(0, 0);
+      -ms-transform:   translate(0, 0);
+       -o-transform:   translate(0, 0);
+          transform:   translate(0, 0);
+  -webkit-transition: opacity 0.1s ease 0s, -webkit-transform 0s ease;
+     -moz-transition: opacity 0.1s ease 0s,    -moz-transform 0s ease;
+      -ms-transition: opacity 0.1s ease 0s,     -ms-transform 0s ease;
+       -o-transition: opacity 0.1s ease 0s,      -o-transform 0s ease;
+          transition: opacity 0.1s ease 0s,         transform 0s ease;
 }
 
-.sk-scroll-bar.active {
-  opacity: 1;
+.sk-scroll-indicator.sk-hidden {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease 0.3s, -webkit-transform 0s ease;
+     -moz-transition: opacity 0.3s ease 0.3s,    -moz-transform 0s ease;
+      -ms-transition: opacity 0.3s ease 0.3s,     -ms-transform 0s ease;
+       -o-transition: opacity 0.3s ease 0.3s,      -o-transform 0s ease;
+          transition: opacity 0.3s ease 0.3s,         transform 0s ease;
 }
 
 .sk-page-container-horizontal {
@@ -221,8 +177,4 @@ body {
   width: 100%;
   height: 100%;
   position: relative;
-}
-
-.sk-hidden {
-  display: none;
 }
