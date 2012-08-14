@@ -67,19 +67,28 @@ body {
   background: none;
 }
 
-.sk-scroll-view::-webkit-scrollbar {
+.sk-scroll-view.sk-no-touch {
+  overflow: auto;
+  -webkit-transform: none;
+     -moz-transform: none;
+      -ms-transform: none;
+       -o-transform: none;
+          transform: none;
+}
+
+.sk-no-touch::-webkit-scrollbar {
   background: #ddd;
   width: 12px;
   height: 12px;
 }
 
-.sk-scroll-view::-webkit-scrollbar-thumb {
+.sk-no-touch::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.5);
   -webkit-border-radius: 10px;
           border-radius: 10px;
 }
 
-.sk-scroll-view::-webkit-scrollbar-track {
+.sk-no-touch::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px 0 rgba(0, 0, 0, 0.3);
           box-shadow: inset 0 0 6px 0 rgba(0, 0, 0, 0.3); 
   -webkit-border-radius: 10px;
@@ -113,6 +122,19 @@ body {
       -ms-transition:     -ms-transform 0s ease;
        -o-transition:      -o-transform 0s ease;
           transition:         transform 0s ease;
+}
+
+.sk-no-touch > .sk-scroll-content {
+  -webkit-transform: none;
+     -moz-transform: none;
+      -ms-transform: none;
+       -o-transform: none;
+          transform: none;
+  -webkit-transition: none;
+     -moz-transition: none;
+      -ms-transition: none;
+       -o-transition: none;
+          transition: none;
 }
 
 .sk-scroll-indicator {

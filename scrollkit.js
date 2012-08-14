@@ -129,7 +129,7 @@ ScrollKit.ScrollView = function ScrollView(element) {
   
   var isTouchSupported = !!('ontouchstart' in window);
   if (!isTouchSupported && !useMouseDragScrolling) {
-    $element.css('overflow', 'auto');
+    $element.addClass('sk-no-touch');
     $element.bind('scroll', function(evt) {
       scrollPosition.x = this.scrollLeft;
       scrollPosition.y = this.scrollTop;
