@@ -739,7 +739,7 @@ ScrollKit.ScrollView.prototype = {
     y = scrollPosition.y = (this.getShouldScrollVertical()) ? y : 0;
 
     if (!this._useMouseDragScrolling) {
-      $element.scrollLeft(x)
+      $element.scrollLeft(x);
       $element.scrollTop(y);
       return;
     }
@@ -878,7 +878,32 @@ ScrollKit.ScrollView.prototype = {
     
     maximumScrollPosition.x = contentSize.width - size.width;
     maximumScrollPosition.y = contentSize.height - size.height;
-  }
+  },
+  
+  /**
+    Convenience accessor for jQuery's .bind() method.
+  */
+  $bind: function() { this.$element.bind.apply(this.$element, arguments); },
+  
+  /**
+    Convenience accessor for jQuery's .unbind() method.
+  */
+  $unbind: function() { this.$element.unbind.apply(this.$element, arguments); },
+  
+  /**
+    Convenience accessor for jQuery's .delegate() method.
+  */
+  $delegate: function() { this.$element.delegate.apply(this.$element, arguments); },
+  
+  /**
+    Convenience accessor for jQuery's .undelegate() method.
+  */
+  $undelegate: function() { this.$element.undelegate.apply(this.$element, arguments); },
+  
+  /**
+    Convenience accessor for jQuery's .trigger() method.
+  */
+  $trigger: function() { this.$element.trigger.apply(this.$element, arguments); }
 };
 
 $(function() {

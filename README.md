@@ -15,7 +15,7 @@ Simply drop the CSS onto any page:
 Then, include the JavaScript with jQuery:
 
 ``` html
-<script src="jquery-1.7.2.js"></script>
+<script src="jquery-1.8.0.js"></script>
 <script src="scrollkit.js"></script>
 ```
 
