@@ -125,7 +125,7 @@ ScrollKit.ScrollView = function ScrollView(element) {
   var maximumScrollPosition = this._maximumScrollPosition = { x: 0, y: 0 };
   var pageIndexes = this._pageIndexes = { horizontal: 0, vertical: 0 };
   
-  this.recalculateDimensions();
+  window.setTimeout(function() { self.recalculateDimensions(); }, 1);
   
   var isTouchSupported = !!('ontouchstart' in window);
   if (!isTouchSupported && !useMouseDragScrolling) {
