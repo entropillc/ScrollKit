@@ -878,6 +878,8 @@ ScrollKit.ScrollView.prototype = {
     
     maximumScrollPosition.x = contentSize.width - size.width;
     maximumScrollPosition.y = contentSize.height - size.height;
+    
+    $element.trigger('scroll');
   },
   
   /**
